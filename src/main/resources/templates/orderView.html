@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Your order</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+    <link href="../static/css/main.css" th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body>
+<div class="pos-f-t">
+    <nav class="navbar navbar-expand-md navbar-dark " style="background-color: #20B2AA">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Books</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                    <a class="nav-link" href="#" th:href="@{/users}">
+                        Users
+                        <i class="fas fa-users"></i>
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                    <a class="nav-link" href="#" th:href="@{/panel/orders}">
+                        Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" th:href="@{/order}">
+                        ShoppingCart
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link" href="#" th:href="@{/login}">
+                        Login
+                        <i class="fas fa-sign-in-alt"></i>
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="#" th:href="@{/logout}">
+                        Logout
+                        <i class="fas fa-sign-in-alt"></i>
+                    </a>
+                </li>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link" href="#" th:href="@{/register}">
+                        register
+                        <i class="fas fa-user"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </nav>
+</div>
+<div class="container">
+    <div class="jumbotron home-jumbo">
+        <div class="container text-center text-white jumbo-container">
+            <h1 class="display-3">Your order</h1>
+            <a th:href="@{/}">Home</a>
+        </div>
+    </div>
+    <div class="col-6 offset-3" th:if="${!order.books.isEmpty()}">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Delete</th>
+            </tr>
+            </thead>
+            <tbody th:remove="all-but-first">
+            <tr th:each="book, idx: ${order.books}">
+                <th scope="row" th:text="${idx.index+1}"></th>
+                <td th:text="${book.name}"></td>
+                <td th:text="|${book.price} USD|"></td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-danger" title="Delete" th:href="@{/order-delete(bookIndex=${idx.index})}">
+                        <i class="fa fa-minus"></i>
+                    </a>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+        <div class="text-right">
+            <h5 th:text="|To pay: ${#numbers.formatDecimal(sum,1,2,'COMMA')}|">Paying : 99.99$</h5>
+        </div>
+        <form action="#" th:action="@{/order-finalize}" method="post" th:object="${orderDetails}">
+            <div class="form-group">
+                <label for="addressInput">Address</label>
+                <input type="text" class="form-control" id="addressInput" name="address" th:field="*{address}" placeholder="Tehran Valiasr St. " required>
+                <span class="input-group-addon" aria-hidden="true" th:errors="*{address}"></span>
+            </div>
+            <div class="form-group">
+                <label for="telephoneInput">Phone</label>
+                <input type="text" class="form-control" id="telephoneInput" name="telephone"  th:field="*{telephone}" placeholder="021-99**9999" required>
+                <span class="input-group-addon" aria-hidden="true" th:errors="*{telephone}"></span>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-primary">Order</button>
+            </div>
+        </form>
+
+    </div>
+    <div th:if="${order.books.isEmpty()}" class="text-center">
+        <h2>Your order is empty</h2>
+        <a href="#" th:href="@{/}">Add something to your order</a>
+    </div>
+</div>
+</body>
+</html>
